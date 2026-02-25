@@ -1,0 +1,12 @@
+{
+  "domain": "blackmagic_videohub",
+  "name": "Blackmagic Videohub",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://www.blackmagicdesign.com/products/blackmagicvideohub",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "loggers": ["custom_components.blackmagic_videohub"],
+  "requirements": [],
+  "version": "0.1.0"
+}

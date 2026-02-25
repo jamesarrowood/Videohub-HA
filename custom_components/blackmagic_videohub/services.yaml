@@ -1,0 +1,22 @@
+route_output:
+  name: Route output
+  description: Route a Videohub output to a specific input.
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:
+    output:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 999
+          mode: box
+    input:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 999
+          mode: box
