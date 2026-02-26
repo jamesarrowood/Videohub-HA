@@ -13,7 +13,7 @@ DEFAULT_SCAN_INTERVAL = timedelta(seconds=DEFAULT_SCAN_INTERVAL_SECONDS)
 
 CONF_SCAN_INTERVAL = "scan_interval"
 
-PLATFORMS: list[Platform] = [Platform.SELECT]
+PLATFORMS: list[Platform] = [Platform.SELECT, Platform.MEDIA_PLAYER]
 
 SERVICE_ROUTE_OUTPUT = "route_output"
 

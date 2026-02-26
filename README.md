@@ -6,6 +6,7 @@ This repository contains a custom Home Assistant integration that exposes a Blac
 
 - Home Assistant config flow (`Settings -> Devices & Services -> Add Integration`)
 - One `select` entity per Videohub output
+- One `media_player` entity per Videohub output (for built-in media player cards/source selection)
 - Output routing via UI by choosing an input from the select dropdown
 - Service `blackmagic_videohub.route_output` for automations/scripts
 
@@ -40,6 +41,17 @@ data:
   output: 0
   input: 3
 ```
+
+## Built-in Media Player Card (now supported)
+
+The integration also creates `media_player` entities (one per Videohub output), so you can use Home Assistant's built-in media player card and switch routes using the source dropdown.
+
+```yaml
+type: media-control
+entity: media_player.output_0_program
+```
+
+Tip: check the exact entity IDs under `Settings -> Devices & Services -> Blackmagic Videohub -> Entities`.
 
 ## Optional Lovelace Card (same repo)
 
