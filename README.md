@@ -29,6 +29,7 @@ This repository contains a custom Home Assistant integration that exposes a Blac
 
 - The integration uses the Videohub text protocol over TCP (default port `9990`).
 - Output and input indexes in the service call are zero-based, matching the Videohub protocol.
+- This repo also includes an optional Lovelace custom card in `lovelace/blackmagic-videohub-card.js` (manual copy to `/config/www`).
 
 ## Example service call
 
@@ -38,4 +39,61 @@ data:
   entry_id: YOUR_CONFIG_ENTRY_ID
   output: 0
   input: 3
+```
+
+## Optional Lovelace Card (same repo)
+
+This repo includes a simple custom card that makes routing easier than a plain entities card.
+
+### Install the card
+
+1. Copy `lovelace/blackmagic-videohub-card.js` to Home Assistant:
+
+   - Destination: `/config/www/blackmagic-videohub-card.js`
+
+2. Add the Lovelace resource:
+
+   - `Settings -> Dashboards -> Resources -> Add Resource`
+   - URL: `/local/blackmagic-videohub-card.js`
+   - Type: `JavaScript Module`
+
+3. Add a manual card with one of the YAML examples below.
+
+### Auto-discovery example (easy mode)
+
+This looks for `select` entities with `videohub` in the entity id.
+
+```yaml
+type: custom:blackmagic-videohub-card
+title: Videohub Routing
+```
+
+### Explicit entities example (recommended if names are messy)
+
+```yaml
+type: custom:blackmagic-videohub-card
+title: Videohub Routing
+entities:
+  - entity: select.blackmagic_videohub_output_0_program
+    name: Program
+  - entity: select.blackmagic_videohub_output_1_stream
+    name: Stream
+  - entity: select.blackmagic_videohub_output_2_recorder
+    name: Recorder
+```
+
+### Presets example
+
+```yaml
+type: custom:blackmagic-videohub-card
+title: Videohub Routing
+presets:
+  - name: Program -> Cam 1
+    entry_id: YOUR_ENTRY_ID
+    output: 0
+    input: 0
+  - name: Program -> Playback
+    entry_id: YOUR_ENTRY_ID
+    output: 0
+    input: 5
 ```
