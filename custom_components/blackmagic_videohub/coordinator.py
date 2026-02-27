@@ -38,4 +38,18 @@ class BlackmagicVideohubCoordinator(DataUpdateCoordinator[VideohubState]):
 
     async def async_set_route(self, output_index: int, input_index: int) -> None:
         await self.client.async_route_output(output_index, input_index)
-        await self.async_request_refresh()
+        if self.data is None:
+            return
+
+        # Avoid immediate post-route polling; update locally and let normal poll
+        # cadence verify state to reduce connection churn on fragile devices.
+        updated = VideohubState(
+            model_name=self.data.model_name,
+            unique_id=self.data.unique_id,
+            input_labels=dict(self.data.input_labels),
+            output_labels=dict(self.data.output_labels),
+            video_output_routing=dict(self.data.video_output_routing),
+            device_fields=dict(self.data.device_fields),
+        )
+        updated.video_output_routing[output_index] = input_index
+        self.async_set_updated_data(updated)

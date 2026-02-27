@@ -40,24 +40,29 @@ class BlackmagicVideohubClient:
         connect_timeout: float = 5.0,
         idle_read_timeout: float = 0.4,
         max_reads: int = 32,
+        min_command_interval: float = 0.35,
     ) -> None:
         self._host = host
         self._port = port
         self._connect_timeout = connect_timeout
         self._idle_read_timeout = idle_read_timeout
         self._max_reads = max_reads
+        self._min_command_interval = min_command_interval
+        self._op_lock = asyncio.Lock()
+        self._last_command_at = 0.0
 
     async def async_fetch_state(self) -> VideohubState:
         """Connect and read a snapshot."""
-        reader, writer = await asyncio.wait_for(
-            asyncio.open_connection(self._host, self._port),
-            timeout=self._connect_timeout,
-        )
-        try:
-            raw = await self._async_read_snapshot(reader)
-        finally:
-            writer.close()
-            await writer.wait_closed()
+        async with self._op_lock:
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(self._host, self._port),
+                timeout=self._connect_timeout,
+            )
+            try:
+                raw = await self._async_read_snapshot(reader)
+            finally:
+                writer.close()
+                await writer.wait_closed()
 
         if not raw:
             raise ConnectionError("No data received from Videohub")
@@ -65,18 +70,30 @@ class BlackmagicVideohubClient:
 
     async def async_route_output(self, output_index: int, input_index: int) -> None:
         """Route one output to one input."""
-        reader, writer = await asyncio.wait_for(
-            asyncio.open_connection(self._host, self._port),
-            timeout=self._connect_timeout,
-        )
-        del reader
-        try:
-            payload = f"VIDEO OUTPUT ROUTING:\n{output_index} {input_index}\n\n"
-            writer.write(payload.encode("utf-8"))
-            await asyncio.wait_for(writer.drain(), timeout=self._connect_timeout)
-        finally:
-            writer.close()
-            await writer.wait_closed()
+        if output_index < 0 or input_index < 0:
+            raise ValueError("Routing indexes must be >= 0")
+
+        async with self._op_lock:
+            loop = asyncio.get_running_loop()
+            elapsed = loop.time() - self._last_command_at
+            if elapsed < self._min_command_interval:
+                await asyncio.sleep(self._min_command_interval - elapsed)
+
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(self._host, self._port),
+                timeout=self._connect_timeout,
+            )
+            try:
+                # Drain any initial device banner to keep command exchange ordered.
+                await self._async_read_snapshot(reader)
+                payload = f"VIDEO OUTPUT ROUTING:\r\n{output_index} {input_index}\r\n\r\n"
+                writer.write(payload.encode("utf-8"))
+                await asyncio.wait_for(writer.drain(), timeout=self._connect_timeout)
+                await asyncio.sleep(0.05)
+            finally:
+                writer.close()
+                await writer.wait_closed()
+                self._last_command_at = loop.time()
 
     async def _async_read_snapshot(self, reader: asyncio.StreamReader) -> bytes:
         chunks: list[bytes] = []

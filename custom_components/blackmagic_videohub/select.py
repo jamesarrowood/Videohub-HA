@@ -116,6 +116,8 @@ class VideohubOutputRouteSelect(CoordinatorEntity[BlackmagicVideohubCoordinator]
         return VideohubInputOption(index=input_index, label=label).option_value
 
     async def async_select_option(self, option: str) -> None:
+        if option == self.current_option:
+            return
         if option not in self._option_to_index:
             # Refresh mapping from latest coordinator state if needed.
             _ = self.options

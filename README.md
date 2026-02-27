@@ -30,6 +30,7 @@ This repository contains a custom Home Assistant integration that exposes a Blac
 
 - The integration uses the Videohub text protocol over TCP (default port `9990`).
 - Output and input indexes in the service call are zero-based, matching the Videohub protocol.
+- Default poll interval is 30 seconds to reduce load on the router.
 - This repo also includes an optional Lovelace custom card in `lovelace/blackmagic-videohub-card.js` (manual copy to `/config/www`).
 
 ## Example service call

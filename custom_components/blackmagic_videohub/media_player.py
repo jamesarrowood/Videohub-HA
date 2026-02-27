@@ -131,6 +131,8 @@ class VideohubOutputMediaPlayer(
         return VideohubInputSource(index=input_index, label=label).source_value
 
     async def async_select_source(self, source: str) -> None:
+        if source == self.source:
+            return
         if source not in self._source_to_index:
             _ = self.source_list
         input_index = self._source_to_index[source]
