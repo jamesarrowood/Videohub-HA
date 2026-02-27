@@ -83,9 +83,8 @@ class BlackmagicVideohubClient:
                 asyncio.open_connection(self._host, self._port),
                 timeout=self._connect_timeout,
             )
+            del reader
             try:
-                # Drain any initial device banner to keep command exchange ordered.
-                await self._async_read_snapshot(reader)
                 payload = f"VIDEO OUTPUT ROUTING:\r\n{output_index} {input_index}\r\n\r\n"
                 writer.write(payload.encode("utf-8"))
                 await asyncio.wait_for(writer.drain(), timeout=self._connect_timeout)

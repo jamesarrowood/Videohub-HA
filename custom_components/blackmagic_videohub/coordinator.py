@@ -20,7 +20,7 @@ class BlackmagicVideohubCoordinator(DataUpdateCoordinator[VideohubState]):
         *,
         client: BlackmagicVideohubClient,
         name: str,
-        update_interval: timedelta,
+        update_interval: timedelta | None,
     ) -> None:
         super().__init__(
             hass,

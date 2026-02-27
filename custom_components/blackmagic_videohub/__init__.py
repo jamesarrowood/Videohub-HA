@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import timedelta
 import logging
+from typing import Any
 
 import voluptuous as vol
 
@@ -64,17 +65,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: BlackmagicVideohubConfig
     host = entry.data[CONF_HOST]
     port = entry.data.get(CONF_PORT, DEFAULT_PORT)
     name = entry.title or entry.data.get(CONF_NAME, DEFAULT_NAME)
-    scan_seconds = entry.options.get(
+    scan_raw: Any = entry.options.get(
         CONF_SCAN_INTERVAL,
         entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_SECONDS),
     )
+    try:
+        scan_seconds = int(scan_raw)
+    except (TypeError, ValueError):
+        scan_seconds = DEFAULT_SCAN_INTERVAL_SECONDS
+    update_interval = None if scan_seconds <= 0 else timedelta(seconds=scan_seconds)
 
     client = BlackmagicVideohubClient(host=host, port=port)
     coordinator = BlackmagicVideohubCoordinator(
         hass,
         client=client,
         name=name,
-        update_interval=timedelta(seconds=scan_seconds),
+        update_interval=update_interval,
     )
 
     await coordinator.async_config_entry_first_refresh()

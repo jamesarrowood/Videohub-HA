@@ -77,7 +77,7 @@ class BlackmagicVideohubConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Optional(
                         CONF_SCAN_INTERVAL,
                         default=DEFAULT_SCAN_INTERVAL_SECONDS,
-                    ): vol.All(vol.Coerce(int), vol.Range(min=1, max=3600)),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=0, max=3600)),
                 }
             ),
             errors=errors,
@@ -107,7 +107,7 @@ class BlackmagicVideohubOptionsFlow(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_SCAN_INTERVAL, default=current): vol.All(
-                        vol.Coerce(int), vol.Range(min=1, max=3600)
+                        vol.Coerce(int), vol.Range(min=0, max=3600)
                     )
                 }
             ),

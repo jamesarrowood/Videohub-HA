@@ -8,7 +8,7 @@
           "host": "Host",
           "port": "Port",
           "name": "Name",
-          "scan_interval": "Scan interval (seconds)"
+          "scan_interval": "Scan interval (seconds, 0 disables polling)"
         }
       }
     },
@@ -22,7 +22,7 @@
       "init": {
         "title": "Blackmagic Videohub options",
         "data": {
-          "scan_interval": "Scan interval (seconds)"
+          "scan_interval": "Scan interval (seconds, 0 disables polling)"
         }
       }
     }
